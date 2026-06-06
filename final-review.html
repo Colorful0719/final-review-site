@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>期末統計複習：選擇題與實作題</title>
+  <style>
+    :root {
+      --ink: #202124;
+      --muted: #62666d;
+      --line: #d9dde4;
+      --surface: #ffffff;
+      --soft: #f5f7fa;
+      --blue: #1e5b9f;
+      --teal: #23746f;
+      --red: #b3423f;
+      --amber: #9b650d;
+      --green: #287047;
+      --shadow: 0 8px 22px rgba(32, 33, 36, .08);
+      font-family: "Microsoft JhengHei", "PingFang TC", system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(30,91,159,.08), transparent 32%, rgba(35,116,111,.08) 72%, transparent),
+        var(--soft);
+    }
+
+    header {
+      min-height: 36vh;
+      display: grid;
+      align-items: end;
+      padding: 32px max(20px, 7vw) 24px;
+      color: #fff;
+      background:
+        linear-gradient(120deg, rgba(18,35,50,.86), rgba(30,91,159,.70), rgba(35,116,111,.72)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='560' viewBox='0 0 1400 560'%3E%3Crect width='1400' height='560' fill='%23313f4a'/%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.18'%3E%3Cpath d='M90 420 C260 220 390 470 520 250 S780 230 920 130 1130 240 1310 80' stroke-width='6'/%3E%3Cpath d='M100 480 L270 360 L410 380 L570 210 L760 280 L930 130 L1120 220 L1290 90' stroke-width='3'/%3E%3C/g%3E%3Cg fill='%23ffffff' fill-opacity='.36'%3E%3Ccircle cx='270' cy='360' r='8'/%3E%3Ccircle cx='570' cy='210' r='8'/%3E%3Ccircle cx='930' cy='130' r='8'/%3E%3Ccircle cx='1120' cy='220' r='8'/%3E%3C/g%3E%3Cg font-family='Arial' fill='%23ffffff' fill-opacity='.22' font-size='42'%3E%3Ctext x='120' y='150'%3Er = .88%3C/text%3E%3Ctext x='760' y='410'%3EF(3, n) = 56.52%3C/text%3E%3Ctext x='1040' y='320'%3EAlpha%3C/text%3E%3C/g%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero {
+      max-width: 1080px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 4.3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 820px;
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,.90);
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 22px 20px 56px;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 0;
+      background: linear-gradient(180deg, var(--soft) 78%, rgba(245,247,250,0));
+    }
+
+    .tabs, .filters, .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button, select {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+
+    button:hover { transform: translateY(-1px); border-color: #aeb6c2; }
+    button.active {
+      background: #183b5d;
+      color: #fff;
+      border-color: #183b5d;
+    }
+
+    .icon-btn {
+      min-width: 42px;
+      padding: 8px;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 700;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 6px 0 18px;
+    }
+
+    .notice {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 18px;
+      padding: 12px 14px;
+      border: 1px solid #e4d5b9;
+      border-left: 5px solid var(--amber);
+      border-radius: 8px;
+      background: #fff8eb;
+      color: #4a3411;
+      line-height: 1.65;
+      box-shadow: var(--shadow);
+    }
+
+    .notice strong {
+      white-space: nowrap;
+    }
+
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat b {
+      display: block;
+      font-size: 1.45rem;
+      margin-bottom: 3px;
+    }
+
+    .stat span { color: var(--muted); font-size: .92rem; }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin: 24px 0 14px;
+      border-bottom: 2px solid #cfd6df;
+      padding-bottom: 8px;
+    }
+
+    h2 { margin: 0; font-size: 1.45rem; }
+    .hint { color: var(--muted); line-height: 1.65; }
+
+    .question-list, .practice-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .item {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #edf0f4;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--blue);
+      font-size: .84rem;
+      white-space: nowrap;
+    }
+
+    .tag.teal { background: var(--teal); }
+    .tag.amber { background: var(--amber); }
+    .tag.green { background: var(--green); }
+    .tag.red { background: var(--red); }
+
+    .item-body {
+      padding: 16px;
+    }
+
+    .stem {
+      margin: 0 0 12px;
+      line-height: 1.7;
+      font-weight: 700;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      align-items: start;
+      min-height: 46px;
+      border-color: #dfe4ea;
+    }
+
+    .letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eef2f6;
+      font-weight: 700;
+    }
+
+    .option.correct {
+      border-color: #7db996;
+      background: #eef8f2;
+    }
+
+    .option.wrong {
+      border-color: #db928f;
+      background: #fff0ef;
+    }
+
+    .explain {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-left: 4px solid var(--teal);
+      background: #f0f7f6;
+      line-height: 1.75;
+    }
+
+    .explain.show { display: block; }
+
+    .practice-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .spss-workflow {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .spss-panel {
+      border: 1px solid #dfe4ea;
+      border-radius: 8px;
+      background: #fbfcfd;
+      overflow: hidden;
+    }
+
+    .spss-panel h3 {
+      margin: 0;
+      padding: 9px 12px;
+      font-size: .98rem;
+      background: #e9eef5;
+      border-bottom: 1px solid #dfe4ea;
+    }
+
+    .spss-panel-body {
+      padding: 12px;
+      line-height: 1.7;
+    }
+
+    .spss-path {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin: 4px 0 2px;
+    }
+
+    .menu-step {
+      display: inline-flex;
+      min-height: 30px;
+      align-items: center;
+      padding: 4px 9px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      font-weight: 700;
+    }
+
+    .arrow {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .field-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: minmax(104px, .65fr) 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .field-row dt {
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .field-row dd {
+      margin: 0;
+      color: var(--ink);
+    }
+
+    .check-list {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .check-list li {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .check-list li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #e8f4ee;
+      color: var(--green);
+      font-weight: 700;
+      font-size: .8rem;
+    }
+
+    .output-list {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .report-template {
+      margin: 0;
+      padding: 12px;
+      border: 1px dashed #b7c2d0;
+      border-radius: 8px;
+      background: #fff;
+      line-height: 1.75;
+    }
+
+    .steps, .answer-box {
+      line-height: 1.75;
+      margin: 10px 0 0;
+      padding-left: 22px;
+    }
+
+    .practice-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .answer-box {
+      display: none;
+      list-style-position: outside;
+      background: #f7f4ee;
+      border: 1px solid #e4d5b9;
+      border-radius: 8px;
+      padding: 12px 12px 12px 34px;
+    }
+
+    .answer-box.show { display: block; }
+
+    .hidden { display: none !important; }
+
+    footer {
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
+      margin-top: 28px;
+      line-height: 1.7;
+    }
+
+    .footer-notice {
+      margin-top: 8px;
+      color: #4a3411;
+      font-weight: 700;
+    }
+
+    @media (max-width: 760px) {
+      header { min-height: 34vh; padding: 28px 18px 20px; }
+      .toolbar { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .notice { align-items: start; }
+      .notice strong { white-space: normal; }
+      .spss-workflow { grid-template-columns: 1fr; }
+      .field-row { grid-template-columns: 1fr; }
+      .item-head, .section-title { align-items: start; flex-direction: column; }
+      button, select { width: auto; }
+      .actions { justify-content: start; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      header, .toolbar, .stats .stat:nth-child(n+3), .actions, .practice-actions { display: none; }
+      main { max-width: none; padding: 0; }
+      .item { box-shadow: none; break-inside: avoid; }
+      .explain, .answer-box { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hero">
+      <h1>期末統計複習</h1>
+      <p class="subtitle">依據課堂 PDF 範圍整理：相關、迴歸、單因子與二因子 ANOVA、量表信效度與探索性因素分析。選擇題練觀念，實作題練 SPSS 操作與報表判讀。</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar" aria-label="複習工具列">
+      <div>
+        <div class="tabs" role="tablist">
+          <button class="active" data-view="quiz" title="切換到選擇題">選擇題</button>
+          <button data-view="practice" title="切換到實作題">實作題</button>
+          <button data-view="all" title="同時顯示全部題目">全部題目</button>
+        </div>
+      </div>
+      <div class="filters">
+        <select id="topicFilter" aria-label="章節篩選">
+          <option value="all">全部章節</option>
+        </select>
+        <div class="actions">
+          <button id="showAll" class="icon-btn" title="顯示所有詳解" aria-label="顯示所有詳解">ⓘ</button>
+          <button id="reset" class="icon-btn" title="重置作答" aria-label="重置作答">↺</button>
+          <button id="print" class="icon-btn" title="列印複習卷" aria-label="列印複習卷">⎙</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="stats" aria-label="作答統計">
+      <div class="stat"><b id="score">0 / 0</b><span>選擇題答對</span></div>
+      <div class="stat"><b id="accuracy">0%</b><span>目前正確率</span></div>
+      <div class="stat"><b id="answered">0</b><span>已作答題數</span></div>
+      <div class="stat"><b id="practiceCount">0</b><span>實作題數</span></div>
+    </section>
+
+    <div class="notice" role="note">
+      <strong>期末考準備使用</strong>
+      <span>本複習網頁僅供課程期末考自主複習與非營利學習用途，不得商用、販售、轉作付費教材或用於任何營利服務。</span>
+    </div>
+
+    <section id="quizSection">
+      <div class="section-title">
+        <h2>選擇題</h2>
+        <p class="hint">點選答案後會立即顯示判斷與詳解；可用章節篩選重點練習。</p>
+      </div>
+      <div id="questionList" class="question-list"></div>
+    </section>
+
+    <section id="practiceSection" class="hidden">
+      <div class="section-title">
+        <h2>實作題</h2>
+        <p class="hint">每題先看任務與操作步驟，完成後再展開參考答案，練習報告文字怎麼寫。</p>
+      </div>
+      <div id="practiceList" class="practice-list"></div>
+    </section>
+
+    <footer>
+      題目範圍來自使用者提供的 Week 08、10、11、12、13 講義與三份練習 PDF。頁面為本機靜態檔，可直接開啟使用。
+      <div class="footer-notice">期末考準備使用，不可商用。</div>
+    </footer>
+  </main>
+
+  <script>
+    const topics = [
+      "相關分析",
+      "迴歸分析",
+      "單因子 ANOVA",
+      "二因子 ANOVA",
+      "信效度與 EFA",
+      "SPSS 操作判讀"
+    ];
+
+    const questions = [
+      {topic:"相關分析", q:"Pearson 積差相關最適合用來分析哪一種情境？", options:["兩個連續變項之間的線性關係","兩個名目變項之間的百分比差異","三組以上平均數是否不同","一份量表是否具有內部一致性"], answer:0, why:"Pearson r 用於兩個連續變項的線性關係，係數介於 -1 到 1。"},
+      {topic:"相關分析", q:"若 r = -.72，最合適的解讀是什麼？", options:["兩變項有中高程度負相關","兩變項沒有任何關係","X 一定造成 Y 下降","解釋變異量為 72%"], answer:0, why:"負號代表方向，絕對值 .72 常可視為中高或高相關；相關不等於因果。決定係數是 r 平方。"},
+      {topic:"相關分析", q:"相關係數達顯著時，下列哪一句最安全？", options:["兩變項存在統計上的線性關聯","其中一個變項必然導致另一個變項","相關越顯著，r 一定越大","樣本數越小越容易顯著"], answer:0, why:"顯著性只表示線性關聯在統計上不太可能由抽樣誤差造成，不能直接推論因果。"},
+      {topic:"相關分析", q:"r = .88 時，決定係數約為多少？", options:["77.4%","88.0%","44.0%","12.0%"], answer:0, why:"決定係數 r² = .88 × .88 = .7744，可解釋約 77.4% 的變異量。"},
+      {topic:"相關分析", q:"在 SPSS 做雙變數相關時，若要在表中標示顯著相關，應勾選哪個選項？", options:["Flag significant correlations","Display means","Estimate effect size","Save factor scores"], answer:0, why:"相關操作講義提到勾選 Pearson，並勾選標示顯著相關性。"},
+      {topic:"相關分析", q:"Phi 相關通常用於哪一類資料？", options:["兩個二分名目變項","兩個等距連續變項","三個以上平均數比較","因素負荷量排序"], answer:0, why:"Phi 是常用於 2×2 類別資料的相關量數，常與卡方檢定一起判讀。"},
+      {topic:"迴歸分析", q:"簡單線性迴歸的核心目的為何？", options:["用一個自變項預測一個依變項","比較三組以上平均數","檢驗量表內部一致性","找出共同因素並命名"], answer:0, why:"簡單迴歸是以單一 X 預測 Y；多元迴歸則使用多個 X。"},
+      {topic:"迴歸分析", q:"最小平方法的目標是什麼？", options:["讓殘差平方和最小","讓所有自變項都顯著","讓相關係數等於 1","讓組內變異大於組間變異"], answer:0, why:"OLS 迴歸用殘差平方和最小化來估計最佳迴歸線。"},
+      {topic:"迴歸分析", q:"殘差代表什麼？", options:["觀察值與預測值之差","自變項之間的相關","總變異量的百分比","因素負荷量的平方"], answer:0, why:"殘差是 Y 與 Y' 的差，代表模型未能預測的部分。"},
+      {topic:"迴歸分析", q:"多元迴歸模型摘要中的 R 平方主要用來說明什麼？", options:["自變項聯合解釋依變項變異量的比例","每個自變項的單獨平均數","變異數同質性是否成立","因素數量是否足夠"], answer:0, why:"練習二提到以 R² 說明多個變項能聯合預測或解釋依變項多少變異量。"},
+      {topic:"迴歸分析", q:"若迴歸 ANOVA 表的顯著性 p < .05，通常表示什麼？", options:["整體迴歸模型可顯著預測依變項","所有自變項都沒有共線性","每個自變項都必定顯著","殘差完全符合常態"], answer:0, why:"迴歸 ANOVA 檢驗整體模型是否具預測力；個別變項仍需看係數表。"},
+      {topic:"迴歸分析", q:"共線性診斷中，哪個狀況較可能代表問題？", options:["VIF 大於 10","Tolerance 大於 .90","CI 小於 10","R 平方小於 .10"], answer:0, why:"講義列出常見判準：Tolerance < .1、VIF > 10、Condition Index > 30。"},
+      {topic:"迴歸分析", q:"標準化迴歸係數 Beta 適合用來做什麼？", options:["比較不同自變項的相對預測力","計算各組平均數","判斷量表題項數量","決定是否使用 Pearson 或 Phi"], answer:0, why:"Beta 已標準化，常用來比較不同單位自變項對依變項的相對影響。"},
+      {topic:"單因子 ANOVA", q:"單因子 ANOVA 主要檢驗什麼？", options:["一個類別自變項的三組以上平均數是否有差異","兩個連續變項是否線性相關","多個題項是否能萃取因素","多個自變項是否可預測依變項"], answer:0, why:"單因子 ANOVA 比較一個因子不同水準在依變項平均數上的差異。"},
+      {topic:"單因子 ANOVA", q:"ANOVA 的虛無假設通常是什麼？", options:["各組母體平均數相等","所有組別變異數都不相等","至少一組平均數必定不同","自變項與依變項必定相關"], answer:0, why:"F 檢定顯著時，拒絕各組平均數相等的虛無假設。"},
+      {topic:"單因子 ANOVA", q:"Levene 檢定未達顯著時，通常代表什麼？", options:["未違反變異數同質性假定","已違反變異數同質性假定","平均數已達顯著差異","應立即刪除離群值"], answer:0, why:"Levene p > .05 表示各組變異數差異未達顯著，通常可視為同質性未被違反。"},
+      {topic:"單因子 ANOVA", q:"若 Levene 檢定顯著，講義建議應參考哪類檢定？", options:["Welch 或 Brown-Forsythe","Pearson 或 Spearman","KMO 或 Bartlett","Cronbach's alpha"], answer:0, why:"同質性違反時，可看 Welch 或 Brown-Forsythe 的 robust 檢定結果。"},
+      {topic:"單因子 ANOVA", q:"ANOVA 整體 F 達顯著後，為了知道哪些組別不同，通常要做什麼？", options:["事後比較","因素命名","共線性診斷","散佈圖矩陣"], answer:0, why:"整體 F 只告訴至少有組別差異，事後比較如 Scheffe、Tukey 或 Dunnett T3 才能看組間差異。"},
+      {topic:"單因子 ANOVA", q:"若同質性未違反，常見可用的事後比較為何？", options:["Scheffe 或 Tukey","Dunnett T3 優先於所有方法","Kendall's tau-b","主成分分析"], answer:0, why:"練習三提到同質情境下可選 Scheffe 或 Tukey 等事後比較。"},
+      {topic:"單因子 ANOVA", q:"在家庭幸福感例子中，F = 56.52, p < .05 的合理結論是什麼？", options:["不同婚姻狀況在家庭幸福感上有顯著差異","所有婚姻狀況的家庭幸福感完全相同","婚姻狀況與家庭幸福感呈 Pearson 正相關","量表整體信度不足"], answer:0, why:"練習三範例明確將顯著 F 解讀為不同婚姻狀況在家庭幸福感知覺上有顯著差異。"},
+      {topic:"二因子 ANOVA", q:"二因子 ANOVA 比單因子 ANOVA 多了哪個重要判讀？", options:["交互作用","共線性","Cronbach's alpha","KMO"], answer:0, why:"二因子 ANOVA 同時檢驗兩個因子的主要效果與兩者的交互作用。"},
+      {topic:"二因子 ANOVA", q:"交互作用顯著時，最合適的意思是什麼？", options:["一個因子的效果會因另一個因子的水準而改變","兩個因子的主要效果都不可能顯著","依變項沒有任何差異","樣本一定違反常態性"], answer:0, why:"交互作用表示因子 A 對依變項的影響依因子 B 的水準而不同。"},
+      {topic:"二因子 ANOVA", q:"二因子 ANOVA 的報告順序通常應優先看什麼？", options:["先看交互作用，再看主要效果","先看 Cronbach's alpha","只看描述統計，不看 F 值","只看事後比較，不看交互作用"], answer:0, why:"交互作用會影響主要效果的解釋，因此通常先判讀交互作用。"},
+      {topic:"二因子 ANOVA", q:"在 SPSS 做二因子 ANOVA 常用哪一路徑？", options:["Analyze > General Linear Model > Univariate","Analyze > Correlate > Bivariate","Analyze > Dimension Reduction > Factor","Analyze > Scale > Reliability Analysis"], answer:0, why:"二因子與多因子 ANOVA 透過一般線性模式的單變量分析執行。"},
+      {topic:"二因子 ANOVA", q:"若交互作用不顯著，但某一因子的主要效果顯著，通常可怎麼寫？", options:["控制另一因子後，該因子不同水準在依變項上有顯著差異","因為交互作用不顯著，所以所有主要效果都不可解釋","必須改做因素分析","代表模型無法執行"], answer:0, why:"無交互作用時，可較直接報告各因子的主要效果。"},
+      {topic:"信效度與 EFA", q:"Cronbach's alpha 主要評估哪一種品質？", options:["量表或構面的內部一致性信度","兩變項的線性相關","平均數是否相等","自變項共線性"], answer:0, why:"Alpha 是信度分析常用指標，用來評估題項間的一致性。"},
+      {topic:"信效度與 EFA", q:"KMO 與 Bartlett 檢定主要用於判斷什麼？", options:["資料是否適合進行因素分析","迴歸模型是否顯著","變異數是否同質","事後比較是否顯著"], answer:0, why:"EFA 前常先看 KMO 與 Bartlett 球形檢定，評估資料適不適合做因素分析。"},
+      {topic:"信效度與 EFA", q:"探索性因素分析中的因素負荷量主要表示什麼？", options:["題項與因素的關聯程度","各組平均數差異","殘差大小","VIF 大小"], answer:0, why:"因素負荷量可用來判斷題項歸屬、是否跨因素或負荷過低。"},
+      {topic:"信效度與 EFA", q:"直交轉軸的基本假定是什麼？", options:["因素彼此獨立或不相關","因素彼此一定高度相關","題項不可刪除","只能萃取一個因素"], answer:0, why:"直交轉軸假定因素間不相關；斜交轉軸則允許因素間有相關。"},
+      {topic:"信效度與 EFA", q:"斜交轉軸較適合哪種情境？", options:["研究者認為因素間可能有相關","所有因素必須完全獨立","只分析兩個連續變項","只比較兩組平均數"], answer:0, why:"練習一指出斜交假定因素非獨立、因素間有相關。"},
+      {topic:"信效度與 EFA", q:"若某因素只包含 1 或 2 題，講義建議可怎麼處理？", options:["考慮刪除負荷較低題項並重新分析","直接報告為穩定構面","改用 Pearson 相關取代","忽略信度係數"], answer:0, why:"因素涵蓋題目未滿 3 題時，通常需謹慎，可考慮刪題後重新分析。"},
+      {topic:"信效度與 EFA", q:"某題同時在兩個以上因素有高負荷，可能表示什麼？", options:["題意或構念歸屬不清，需考慮修題或刪題","該題必定最好","代表變異數同質","代表模型無共線性"], answer:0, why:"跨負荷題項會降低因素解釋的清楚性，講義列為可考慮刪除的情況。"},
+      {topic:"SPSS 操作判讀", q:"做 EFA 的 SPSS 路徑是哪一個？", options:["Analyze > Dimension Reduction > Factor","Analyze > Compare Means > One-Way ANOVA","Analyze > Correlate > Bivariate","Analyze > Regression > Linear"], answer:0, why:"因素分析操作講義使用「分析 > 維度縮減 > 因素」。"},
+      {topic:"SPSS 操作判讀", q:"做信度分析的 SPSS 路徑通常是哪一個？", options:["Analyze > Scale > Reliability Analysis","Analyze > General Linear Model > Univariate","Analyze > Correlate > Bivariate","Analyze > Compare Means > Means"], answer:0, why:"信度考驗通常使用 Scale 裡的 Reliability Analysis。"},
+      {topic:"SPSS 操作判讀", q:"做單因子 ANOVA 的傳統路徑是哪一個？", options:["Analyze > Compare Means > One-Way ANOVA","Analyze > Dimension Reduction > Factor","Analyze > Scale > Reliability Analysis","Analyze > Descriptive Statistics > Crosstabs"], answer:0, why:"練習三列出單因子 ANOVA 可走 Compare Means 的 One-Way ANOVA。"},
+      {topic:"SPSS 操作判讀", q:"做多元迴歸的 SPSS 路徑通常是哪一個？", options:["Analyze > Regression > Linear","Analyze > Correlate > Bivariate","Analyze > General Linear Model > Repeated Measures","Analyze > Scale > Reliability Analysis"], answer:0, why:"線性迴歸操作通常透過 Regression > Linear，指定依變項與多個自變項。"}
+    ];
+
+    const practices = [
+      {topic:"相關分析", title:"Pearson 相關判讀", level:"基礎", task:"資料有「數學成績」與「自然成績」兩個連續變項。請在 SPSS 進行 Pearson 相關，並撰寫包含 r、p、方向、強度、決定係數的結論。", steps:["Analyze > Correlate > Bivariate。","將兩個連續變項移入 Variables。","勾選 Pearson 與 Flag significant correlations。","判讀相關矩陣中的 r 與 Sig.。"], answer:["若 r = .88 且 p < .01，可寫：數學成績與自然成績呈顯著高度正相關，r = .88, p < .01。","決定係數 r² = .774，表示其中一變項可由另一變項解釋約 77.4% 的變異量。","避免寫成因果，例如「數學成績造成自然成績提高」。"]},
+      {topic:"相關分析", title:"Phi 相關與卡方", level:"進階", task:"資料包含「家庭結構」與「是否有攻擊性行為」兩個二分類變項。請說明如何檢驗兩者關聯。", steps:["Analyze > Descriptive Statistics > Crosstabs。","列入兩個類別變項，勾選 Chi-square。","需要關聯強度時勾選 Phi and Cramer's V。","確認期望次數是否過低，再判讀 Pearson 卡方與 Phi。"], answer:["若 Pearson 卡方顯著且 Phi 也顯著，可寫兩個二分變項間有顯著關聯。","Phi 的正負與大小可輔助解釋關聯方向與強度，但需搭配交叉表百分比。"]},
+      {topic:"迴歸分析", title:"多元迴歸模型摘要", level:"基礎", task:"以五個學校經營變項預測學校效能，模型摘要顯示 R² = .606。請寫出報告語句。", steps:["Analyze > Regression > Linear。","將學校效能放入 Dependent。","將五個預測變項放入 Independent。","在 Model Summary 判讀 R Square，在 ANOVA 表判讀整體模型顯著性。"], answer:["可寫：五個自變項可聯合解釋學校效能 60.6% 的變異量。","若 ANOVA 表 p < .05，可進一步寫整體迴歸模型具有顯著預測力。","個別變項是否顯著需看 Coefficients 表的 t 與 p。"]},
+      {topic:"迴歸分析", title:"共線性診斷", level:"進階", task:"請依據迴歸係數表判斷是否有共線性問題，並說明常見判準。", steps:["在線性迴歸 Options 或 Statistics 中勾選 Collinearity diagnostics。","查看 Coefficients 表中的 Tolerance 與 VIF。","必要時查看 Condition Index。"], answer:["Tolerance < .10、VIF > 10 或 Condition Index > 30 時，需懷疑共線性問題。","若出現共線性，可考慮刪除高度重疊變項、合成構面或重新檢視理論模型。"]},
+      {topic:"迴歸分析", title:"殘差與偏離值", level:"基礎", task:"迴歸輸出出現標準化殘差大於 1.96 的個案，請說明其意義與處理態度。", steps:["在 Regression 的 Save 可儲存標準化殘差。","檢查殘差統計量與散佈圖。","回到資料檢查該個案是否輸入錯誤或具有特殊意義。"], answer:["殘差是觀察值與預測值之差，殘差越大代表模型預測誤差越大。","標準化殘差大於 1.96 可視為可能偏離值，需檢查但不應無理由刪除。"]},
+      {topic:"單因子 ANOVA", title:"家庭幸福感單因子 ANOVA", level:"基礎", task:"以婚姻狀況比較家庭幸福感。Levene p > .05，ANOVA F = 56.52, p < .05。請寫完整結論。", steps:["Analyze > Compare Means > One-Way ANOVA。","Dependent List 放家庭幸福感，Factor 放婚姻狀況。","Options 勾選 Descriptive 與 Homogeneity of variance test。","Post Hoc 可選 Scheffe 或 Tukey。"], answer:["Levene 未達顯著，表示未違反變異數同質性假定。","整體 F 達顯著，表示不同婚姻狀況在家庭幸福感上有顯著差異。","接著需依 Scheffe 或 Tukey 事後比較說明哪些婚姻狀況彼此不同。"]},
+      {topic:"單因子 ANOVA", title:"同質性違反時的報告", level:"進階", task:"若單因子 ANOVA 的 Levene p < .05，請說明接下來要看什麼，以及事後比較可如何選擇。", steps:["先確認 Levene 檢定顯著，代表同質性假定被違反。","查看 Welch 或 Brown-Forsythe robust 檢定。","若 robust 檢定顯著，再進行適合異質變異的事後比較。"], answer:["同質性違反時，不宜只依傳統 ANOVA 表做結論。","若 Welch 或 Brown-Forsythe 顯著，可報告組間平均數仍有顯著差異。","事後比較可採 Dunnett T3。"]},
+      {topic:"二因子 ANOVA", title:"二因子 ANOVA 操作流程", level:"基礎", task:"研究想了解性別與教學法對學習成就的影響。請列出 SPSS 操作與報表判讀順序。", steps:["Analyze > General Linear Model > Univariate。","Dependent Variable 放學習成就。","Fixed Factors 放性別與教學法。","Options 勾選 Descriptive statistics、Homogeneity tests、Estimates of effect size。","先看交互作用，再看主要效果。"], answer:["若性別 × 教學法交互作用顯著，表示教學法效果會因性別不同而改變。","若交互作用不顯著，再分別報告性別主要效果與教學法主要效果。","若因子有三個以上水準且主要效果顯著，可做事後比較。"]},
+      {topic:"二因子 ANOVA", title:"交互作用敘述", level:"進階", task:"二因子 ANOVA 顯示 A × B 交互作用 p < .05。請寫出一段不過度推論的報告文字。", steps:["確認 Tests of Between-Subjects Effects 中交互作用列的 F 與 p。","檢視 Estimated Marginal Means 或交互作用圖。","依各水準平均數描述趨勢。"], answer:["可寫：A 因子與 B 因子在依變項上存在顯著交互作用，F = ..., p < .05，表示 A 的效果會隨 B 的水準而不同。","接著應搭配平均數或簡單主要效果說明差異方向，避免只寫「兩者有關」。"]},
+      {topic:"信效度與 EFA", title:"EFA 前置檢查", level:"基礎", task:"正式問卷剩 21 題，要評估初步建構效度。請說明進行 EFA 前與第一階段輸出應看哪些表。", steps:["Analyze > Dimension Reduction > Factor。","將題項放入 Variables。","在 Descriptives 勾選 KMO and Bartlett's test。","Extraction 可檢視共同性、特徵值、解釋變異量與陡坡圖。"], answer:["先看 KMO 與 Bartlett，確認資料適合因素分析。","再看共同性、特徵值、總解釋變異量與陡坡圖，決定可萃取因素數。","最後依轉軸後成份矩陣判斷題項歸屬與因素命名。"]},
+      {topic:"信效度與 EFA", title:"直交與斜交轉軸比較", level:"進階", task:"同一份服務品質問卷需要用直交與斜交兩種轉軸做分析。請說明兩者報告重點差異。", steps:["在 Rotation 分別選 Varimax 類直交轉軸與 Oblimin 類斜交轉軸。","比較旋轉後矩陣、因素命名與總解釋變異量。","斜交時留意因素間相關。"], answer:["直交轉軸假定因素彼此獨立，報告各因素解釋變異量與負荷量較直觀。","斜交轉軸允許因素間相關，重點在共同因素可解釋的總變異量與題項歸屬。","若斜交只是改變權重，總解釋變異量本身不會因斜交而改變。"]},
+      {topic:"信效度與 EFA", title:"信度分析與刪題判斷", level:"基礎", task:"某構面 Cronbach's alpha = .500，且其中一題跨兩個因素負荷。請說明可能處理方式。", steps:["Analyze > Scale > Reliability Analysis。","查看 Cronbach's Alpha 與 Item-Total Statistics。","回到 EFA 檢查因素負荷量、跨負荷與每因素題數。"], answer:["Alpha = .500 通常代表內部一致性偏低，需檢查題項內容與題項總分相關。","跨負荷題項可能構念歸屬不清，可考慮修題、刪題後重新分析。","若因素只剩 1 或 2 題，也需重新檢視構面是否穩定。"]}
+    ];
+
+    const spssPractices = [
+      {
+        topic:"相關分析",
+        title:"Pearson 積差相關",
+        level:"基礎操作",
+        case:"想知道數學成績與自然成績是否有顯著線性關係。",
+        path:["Analyze","Correlate","Bivariate"],
+        fields:[["Variables","數學成績、自然成績"],["Correlation Coefficients","勾選 Pearson"],["Test of Significance","Two-tailed"],["其他","勾選 Flag significant correlations"]],
+        options:["按 Options 可勾選 Means and standard deviations。","缺失值可先使用 Exclude cases pairwise。"],
+        outputs:["Correlations 表：看 Pearson Correlation、Sig.、N。","若 r = .88 且 p < .01，代表顯著正相關。","決定係數 r² = .774，約可解釋 77.4% 變異量。"],
+        template:"數學成績與自然成績呈顯著高度正相關，r = .88, p < .01，r² = .774，表示兩者共享約 77.4% 的變異量；此結果只能說明關聯，不能直接推論因果。"
+      },
+      {
+        topic:"相關分析",
+        title:"Phi 相關與卡方",
+        level:"類別資料",
+        case:"想檢驗家庭結構與是否有攻擊性行為兩個二分類變項是否有關。",
+        path:["Analyze","Descriptive Statistics","Crosstabs"],
+        fields:[["Rows","家庭結構"],["Columns","攻擊性行為"],["Statistics","Chi-square、Phi and Cramer's V"],["Cells","Observed、Expected、Row % 或 Column %"]],
+        options:["先看期望次數是否過低。","2x2 表可看 Phi；較大列聯表可看 Cramer's V。"],
+        outputs:["Chi-Square Tests 表：看 Pearson Chi-Square 的 p 值。","Symmetric Measures 表：看 Phi 的關聯強度。","交叉表百分比用來描述方向與差異在哪些類別。"],
+        template:"家庭結構與攻擊性行為之間有顯著關聯，χ² = ..., p < .05；Phi = ...，表示兩個二分類變項具有 ... 程度的關聯。"
+      },
+      {
+        topic:"迴歸分析",
+        title:"多元線性迴歸",
+        level:"基礎操作",
+        case:"以多個學校經營變項預測學校效能，並說明整體模型解釋力。",
+        path:["Analyze","Regression","Linear"],
+        fields:[["Dependent","學校效能"],["Independent(s)","策略計畫、持續改善、資訊分析等預測變項"],["Method","Enter 或 Stepwise，依題目要求"],["Statistics","Estimates、Model fit、Collinearity diagnostics"]],
+        options:["需要殘差檢查時，到 Save 勾選 Standardized residuals。","逐步迴歸題目要注意變項進入模型的順序。"],
+        outputs:["Model Summary：看 R Square。","ANOVA：看整體模型 p 值。","Coefficients：看 B、Beta、t、p。"],
+        template:"整體迴歸模型達顯著，F = ..., p < .05；R² = .606，表示自變項可聯合解釋學校效能 60.6% 的變異量。"
+      },
+      {
+        topic:"迴歸分析",
+        title:"共線性診斷",
+        level:"報表判讀",
+        case:"多元迴歸中需要確認自變項之間是否高度重疊。",
+        path:["Analyze","Regression","Linear","Statistics"],
+        fields:[["Statistics","勾選 Collinearity diagnostics"],["Coefficients 表","查看 Tolerance、VIF"],["Collinearity Diagnostics 表","查看 Condition Index"],["判準","Tolerance < .10、VIF > 10、CI > 30 需警覺"]],
+        options:["若共線性嚴重，先檢查變項概念是否重複。","可考慮刪除、合併或改用構面分數。"],
+        outputs:["Tolerance 越小代表該自變項越能被其他自變項解釋。","VIF 越大代表膨脹越嚴重。","CI 大於 30 常被視為高共線性警訊。"],
+        template:"共線性診斷顯示 Tolerance = ...、VIF = ...、CI = ...，依常用判準判斷，本模型是否存在明顯共線性問題。"
+      },
+      {
+        topic:"迴歸分析",
+        title:"殘差與偏離值",
+        level:"假設檢查",
+        case:"迴歸後要檢查是否有預測誤差過大的個案。",
+        path:["Analyze","Regression","Linear","Save"],
+        fields:[["Save","Standardized Residuals"],["Plots","可放 ZPRED 與 ZRESID 檢查散佈"],["資料檢查","回資料表查看標準化殘差欄位"],["判準","標準化殘差絕對值大於 1.96 可標記檢查"]],
+        options:["偏離值不等於錯誤資料，不能直接刪除。","需確認是否輸入錯誤、特殊個案或模型遺漏重要變項。"],
+        outputs:["Residuals Statistics：看殘差範圍。","散佈圖：看是否有明顯型態。","個案表：找出偏離較大的觀察值。"],
+        template:"標準化殘差大於 1.96 的個案可視為可能偏離值，表示觀察值與預測值差距較大，需進一步檢查資料與模型假設。"
+      },
+      {
+        topic:"單因子 ANOVA",
+        title:"單因子變異數分析",
+        level:"基礎操作",
+        case:"比較不同婚姻狀況在家庭幸福感上的平均數是否不同。",
+        path:["Analyze","Compare Means","One-Way ANOVA"],
+        fields:[["Dependent List","家庭幸福感"],["Factor","婚姻狀況"],["Options","Descriptive、Homogeneity of variance test"],["Post Hoc","同質時可選 Scheffe 或 Tukey"]],
+        options:["先判讀 Levene 檢定。","Levene p > .05 時，通常可視為未違反同質性。","整體 F 顯著後再看事後比較。"],
+        outputs:["Test of Homogeneity：看 Levene p。","ANOVA 表：看 F 與 p。","Multiple Comparisons：看哪些組別差異顯著。"],
+        template:"Levene 檢定未達顯著，未違反變異數同質性；ANOVA 結果顯示不同婚姻狀況在家庭幸福感上有顯著差異，F = 56.52, p < .05。"
+      },
+      {
+        topic:"單因子 ANOVA",
+        title:"同質性違反處理",
+        level:"進階判讀",
+        case:"單因子 ANOVA 中 Levene 檢定顯著，需要改看 robust 檢定。",
+        path:["Analyze","Compare Means","One-Way ANOVA","Options"],
+        fields:[["Options","勾選 Welch、Brown-Forsythe"],["Post Hoc","異質時選 Dunnett T3"],["先看","Levene p 是否 < .05"],["再看","Welch 或 Brown-Forsythe 是否顯著"]],
+        options:["Levene 顯著代表變異數同質性假定被違反。","若 Welch 或 Brown-Forsythe 顯著，仍可說組間平均數有差異。"],
+        outputs:["Robust Tests of Equality of Means：看 Welch / Brown-Forsythe。","Dunnett T3：看異質變異下的組間差異。"],
+        template:"Levene 檢定達顯著，表示違反變異數同質性；因此改參考 Welch / Brown-Forsythe。若其 p < .05，表示各組平均數仍存在顯著差異。"
+      },
+      {
+        topic:"二因子 ANOVA",
+        title:"二因子變異數分析",
+        level:"基礎操作",
+        case:"檢驗性別與教學法對學習成就的主要效果與交互作用。",
+        path:["Analyze","General Linear Model","Univariate"],
+        fields:[["Dependent Variable","學習成就"],["Fixed Factor(s)","性別、教學法"],["Model","Full factorial"],["Options","Descriptive statistics、Homogeneity tests、Estimates of effect size"]],
+        options:["若需要平均數圖，可在 Plots 放入兩個因子。","教學法若有三個以上水準，主要效果顯著時可做 Post Hoc。"],
+        outputs:["Tests of Between-Subjects Effects：看性別、教學法、性別*教學法。","Levene's Test：看同質性。","Estimated Marginal Means 或圖：輔助描述趨勢。"],
+        template:"二因子 ANOVA 需先判讀交互作用。若性別 × 教學法顯著，表示教學法對學習成就的效果會因性別水準而不同。"
+      },
+      {
+        topic:"二因子 ANOVA",
+        title:"交互作用報告",
+        level:"報表判讀",
+        case:"Tests of Between-Subjects Effects 顯示 A × B 交互作用達顯著。",
+        path:["Analyze","General Linear Model","Univariate","Plots / EM Means"],
+        fields:[["Horizontal Axis","A 因子"],["Separate Lines","B 因子"],["EM Means","選 A*B"],["Compare simple effects","依課堂要求或教師指定"]],
+        options:["交互作用顯著時，不要只報告主要效果。","需搭配平均數表或交互作用圖說明差異方向。"],
+        outputs:["A*B 列：看 F 與 p。","Descriptive Statistics：看各格平均數。","交互作用圖：看線條是否不平行或交叉。"],
+        template:"A 與 B 對依變項有顯著交互作用，F = ..., p < .05，表示 A 的效果會隨 B 的不同水準而改變；後續需檢視簡單主要效果或各組平均數。"
+      },
+      {
+        topic:"信效度與 EFA",
+        title:"探索性因素分析 EFA",
+        level:"基礎操作",
+        case:"正式問卷保留 21 題後，要評估初步建構效度並萃取因素。",
+        path:["Analyze","Dimension Reduction","Factor"],
+        fields:[["Variables","放入所有量表題項"],["Descriptives","KMO and Bartlett's test"],["Extraction","共同性、特徵值、Scree plot"],["Rotation","Varimax 或 Oblimin，依題目要求"]],
+        options:["先看 KMO 與 Bartlett 判斷是否適合因素分析。","再看共同性、特徵值、總解釋變異量與陡坡圖。","最後看轉軸後矩陣做題項歸屬與因素命名。"],
+        outputs:["KMO and Bartlett's Test：資料適合性。","Total Variance Explained：因素數與總解釋變異量。","Rotated Component Matrix / Pattern Matrix：因素負荷量。"],
+        template:"KMO = ...，Bartlett 球形檢定達顯著，表示資料適合進行因素分析；依特徵值、陡坡圖與轉軸後因素負荷量，可萃取 ... 個因素。"
+      },
+      {
+        topic:"信效度與 EFA",
+        title:"直交與斜交轉軸",
+        level:"進階操作",
+        case:"同一份服務品質問卷需分別採直交與斜交轉軸比較因素結構。",
+        path:["Analyze","Dimension Reduction","Factor","Rotation"],
+        fields:[["直交","Varimax，假定因素彼此獨立"],["斜交","Oblimin，允許因素彼此相關"],["Display","Rotated solution"],["Options","Suppress small coefficients 可隱藏低負荷量"]],
+        options:["直交常看 Rotated Component Matrix。","斜交常看 Pattern Matrix 與因素相關。","若題項跨負荷或負荷量太低，需考慮修題或刪題。"],
+        outputs:["因素負荷量：判斷題項歸屬。","總解釋變異量：說明共同因素可解釋多少變異。","因素相關：斜交結果中特別需要留意。"],
+        template:"直交轉軸假定因素獨立；斜交轉軸允許因素相關。若理論上構面可能彼此關聯，斜交結果通常較符合量表發展情境。"
+      },
+      {
+        topic:"信效度與 EFA",
+        title:"信度分析",
+        level:"基礎操作",
+        case:"依因素分析結果，分別計算各構面的 Cronbach's alpha。",
+        path:["Analyze","Scale","Reliability Analysis"],
+        fields:[["Items","放入同一構面的題項"],["Model","Alpha"],["Statistics","Scale if item deleted、Item、Scale"],["重複操作","每個構面各跑一次，最後可跑全量表"]],
+        options:["Alpha 偏低時，查看 Corrected Item-Total Correlation。","查看 Cronbach's Alpha if Item Deleted 判斷刪題是否改善。","因素內題項太少時，信度解釋要更謹慎。"],
+        outputs:["Reliability Statistics：看 Cronbach's Alpha。","Item-Total Statistics：看題項總分相關與刪題後 alpha。","若 alpha = .500，通常代表內部一致性偏低。"],
+        template:"本構面的 Cronbach's alpha = ...，表示內部一致性為 ...；若刪除某題後 alpha 提升，且該題題項總分相關偏低，可考慮修題或刪題後重新分析。"
+      }
+    ];
+
+    const state = {
+      view: "quiz",
+      topic: "all",
+      answers: new Map()
+    };
+
+    const topicFilter = document.querySelector("#topicFilter");
+    const questionList = document.querySelector("#questionList");
+    const practiceList = document.querySelector("#practiceList");
+    const quizSection = document.querySelector("#quizSection");
+    const practiceSection = document.querySelector("#practiceSection");
+
+    function init() {
+      topics.forEach(topic => {
+        const option = document.createElement("option");
+        option.value = topic;
+        option.textContent = topic;
+        topicFilter.appendChild(option);
+      });
+      document.querySelectorAll("[data-view]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.view = btn.dataset.view;
+          document.querySelectorAll("[data-view]").forEach(b => b.classList.toggle("active", b === btn));
+          render();
+        });
+      });
+      topicFilter.addEventListener("change", () => {
+        state.topic = topicFilter.value;
+        render();
+      });
+      document.querySelector("#reset").addEventListener("click", () => {
+        state.answers.clear();
+        document.querySelectorAll(".explain, .answer-box").forEach(el => el.classList.remove("show"));
+        render();
+      });
+      document.querySelector("#showAll").addEventListener("click", () => {
+        document.querySelectorAll(".explain, .answer-box").forEach(el => el.classList.add("show"));
+      });
+      document.querySelector("#print").addEventListener("click", () => window.print());
+      render();
+    }
+
+    function filtered(items) {
+      return state.topic === "all" ? items : items.filter(item => item.topic === state.topic);
+    }
+
+    function tagClass(topic) {
+      if (topic.includes("迴歸")) return "teal";
+      if (topic.includes("ANOVA")) return topic.includes("二") ? "red" : "amber";
+      if (topic.includes("信效度")) return "green";
+      return "";
+    }
+
+    function render() {
+      const showQuiz = state.view === "quiz" || state.view === "all";
+      const showPractice = state.view === "practice" || state.view === "all";
+      quizSection.classList.toggle("hidden", !showQuiz);
+      practiceSection.classList.toggle("hidden", !showPractice);
+      renderQuestions();
+      renderPractice();
+      updateStats();
+    }
+
+    function renderQuestions() {
+      questionList.innerHTML = "";
+      filtered(questions).forEach((item, index) => {
+        const originalIndex = questions.indexOf(item);
+        const selected = state.answers.get(originalIndex);
+        const article = document.createElement("article");
+        article.className = "item";
+        article.innerHTML = `
+          <div class="item-head">
+            <span class="tag ${tagClass(item.topic)}">${item.topic}</span>
+            <span class="hint">第 ${index + 1} 題</span>
+          </div>
+          <div class="item-body">
+            <p class="stem">${item.q}</p>
+            <div class="options"></div>
+            <div class="explain ${selected !== undefined ? "show" : ""}">
+              <b>答案：${String.fromCharCode(65 + item.answer)}</b>。${item.why}
+            </div>
+          </div>`;
+        const optionBox = article.querySelector(".options");
+        item.options.forEach((text, optionIndex) => {
+          const btn = document.createElement("button");
+          btn.className = "option";
+          if (selected !== undefined) {
+            if (optionIndex === item.answer) btn.classList.add("correct");
+            if (optionIndex === selected && selected !== item.answer) btn.classList.add("wrong");
+          }
+          btn.innerHTML = `<span class="letter">${String.fromCharCode(65 + optionIndex)}</span><span>${text}</span>`;
+          btn.addEventListener("click", () => {
+            state.answers.set(originalIndex, optionIndex);
+            render();
+          });
+          optionBox.appendChild(btn);
+        });
+        questionList.appendChild(article);
+      });
+    }
+
+    function renderPractice() {
+      practiceList.innerHTML = "";
+      filtered(spssPractices).forEach((item, index) => {
+        const article = document.createElement("article");
+        article.className = "item";
+        article.innerHTML = `
+          <div class="item-head">
+            <span class="tag ${tagClass(item.topic)}">${item.topic}</span>
+            <span class="hint">實作 ${index + 1}</span>
+          </div>
+          <div class="item-body">
+            <div class="practice-meta"><span class="tag teal">${item.level}</span><span class="tag ${tagClass(item.topic)}">${item.title}</span></div>
+            <p class="stem">${item.case}</p>
+            <div class="spss-workflow">
+              <div class="spss-panel">
+                <h3>SPSS 分析路徑</h3>
+                <div class="spss-panel-body">
+                  <div class="spss-path">${item.path.map((step, i) => `${i ? '<span class="arrow">></span>' : ''}<span class="menu-step">${step}</span>`).join("")}</div>
+                </div>
+              </div>
+              <div class="spss-panel">
+                <h3>對話框設定</h3>
+                <div class="spss-panel-body">
+                  <dl class="field-list">${item.fields.map(([label, value]) => `<div class="field-row"><dt>${label}</dt><dd>${value}</dd></div>`).join("")}</dl>
+                </div>
+              </div>
+              <div class="spss-panel">
+                <h3>操作提醒</h3>
+                <div class="spss-panel-body">
+                  <ul class="check-list">${item.options.map(line => `<li>${line}</li>`).join("")}</ul>
+                </div>
+              </div>
+              <div class="spss-panel">
+                <h3>作答目標</h3>
+                <div class="spss-panel-body">
+                  <p class="report-template">先完成 SPSS 設定，再展開輸出判讀與報告句型。</p>
+                </div>
+              </div>
+            </div>
+            <div class="practice-actions"><button type="button">顯示輸出判讀</button></div>
+            <div class="answer-box">
+              <b>輸出表判讀</b>
+              <ol class="output-list">${item.outputs.map(line => `<li>${line}</li>`).join("")}</ol>
+              <b>報告句型</b>
+              <p class="report-template">${item.template}</p>
+            </div>
+          </div>`;
+        const btn = article.querySelector(".practice-actions button");
+        const answer = article.querySelector(".answer-box");
+        btn.addEventListener("click", () => {
+          answer.classList.toggle("show");
+          btn.textContent = answer.classList.contains("show") ? "隱藏輸出判讀" : "顯示輸出判讀";
+        });
+        practiceList.appendChild(article);
+      });
+    }
+
+    function updateStats() {
+      let answered = 0;
+      let correct = 0;
+      state.answers.forEach((value, key) => {
+        answered += 1;
+        if (questions[key] && questions[key].answer === value) correct += 1;
+      });
+      document.querySelector("#score").textContent = `${correct} / ${questions.length}`;
+      document.querySelector("#answered").textContent = answered;
+      document.querySelector("#accuracy").textContent = answered ? `${Math.round(correct / answered * 100)}%` : "0%";
+      document.querySelector("#practiceCount").textContent = filtered(spssPractices).length;
+    }
+
+    init();
+  </script>
+</body>
+</html>
