@@ -17,6 +17,7 @@
       --amber: #9b650d;
       --green: #287047;
       --shadow: 0 8px 22px rgba(32, 33, 36, .08);
+      --page-pad: clamp(14px, 3vw, 28px);
       font-family: "Microsoft JhengHei", "PingFang TC", system-ui, -apple-system, sans-serif;
     }
 
@@ -64,7 +65,7 @@
     main {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 22px 20px 56px;
+      padding: 22px var(--page-pad) 56px;
     }
 
     .toolbar {
@@ -72,11 +73,12 @@
       top: 0;
       z-index: 5;
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 14px;
       align-items: center;
       padding: 14px 0;
       background: linear-gradient(180deg, var(--soft) 78%, rgba(245,247,250,0));
+      backdrop-filter: blur(8px);
     }
 
     .tabs, .filters, .actions {
@@ -86,14 +88,26 @@
       align-items: center;
     }
 
+    .filters {
+      justify-content: end;
+    }
+
+    .tabs button {
+      flex: 0 0 auto;
+    }
+
     button, select {
-      min-height: 40px;
+      min-height: 44px;
       border: 1px solid var(--line);
       background: var(--surface);
       color: var(--ink);
       border-radius: 8px;
       padding: 8px 12px;
       font: inherit;
+    }
+
+    select {
+      max-width: min(360px, 100%);
     }
 
     button {
@@ -298,6 +312,7 @@
     .spss-panel-body {
       padding: 12px;
       line-height: 1.7;
+      overflow-wrap: anywhere;
     }
 
     .spss-path {
@@ -317,6 +332,7 @@
       border-radius: 6px;
       background: #fff;
       font-weight: 700;
+      overflow-wrap: anywhere;
     }
 
     .arrow {
@@ -434,9 +450,55 @@
       font-weight: 700;
     }
 
+    @media (min-width: 761px) and (max-width: 1024px) {
+      header { min-height: 32vh; }
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+      .filters {
+        justify-content: space-between;
+      }
+      .stats {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .spss-workflow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
     @media (max-width: 760px) {
-      header { min-height: 34vh; padding: 28px 18px 20px; }
-      .toolbar { grid-template-columns: 1fr; }
+      header { min-height: 30vh; padding: 24px var(--page-pad) 18px; }
+      main { padding-top: 14px; }
+      .toolbar {
+        position: static;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 10px 0 14px;
+      }
+      .tabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        width: 100%;
+      }
+      .tabs button {
+        width: 100%;
+        min-width: 0;
+        padding-inline: 8px;
+      }
+      .filters {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        width: 100%;
+        justify-content: stretch;
+        align-items: center;
+      }
+      .filters select {
+        width: 100%;
+        max-width: none;
+      }
+      .actions {
+        flex-wrap: nowrap;
+      }
       .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .notice { align-items: start; }
       .notice strong { white-space: normal; }
@@ -445,6 +507,38 @@
       .item-head, .section-title { align-items: start; flex-direction: column; }
       button, select { width: auto; }
       .actions { justify-content: start; }
+    }
+
+    @media (max-width: 430px) {
+      :root { --page-pad: 12px; }
+      h1 { font-size: 2rem; }
+      .subtitle { font-size: .98rem; line-height: 1.65; }
+      .stats { gap: 8px; }
+      .stat { padding: 11px; }
+      .stat b { font-size: 1.22rem; }
+      .filters {
+        grid-template-columns: 1fr;
+      }
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 100%;
+      }
+      .icon-btn {
+        width: 100%;
+      }
+      .option {
+        grid-template-columns: 26px 1fr;
+        min-height: 50px;
+        padding: 10px;
+      }
+      .letter {
+        width: 26px;
+        height: 26px;
+      }
+      .item-body {
+        padding: 14px;
+      }
     }
 
     @media print {
